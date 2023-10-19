@@ -1,0 +1,231 @@
+To get the version of the docker
+cmd> docker -v
+
+
+To pull images from docker hub
+cmd> docker pull docker/whalesay
+
+
+To run the image which is available locally 
+Cmd> docker run docker/whalesay cowsay boo
+Note: If the message is not available locally, this command pull it from docker hub.
+
+
+
+
+To see all the available images
+cmd> docker images
+
+
+To remove images
+Cmd> docker rmi <Image_Id> -f
+
+
+
+To view all the running containers
+Cmd> docker ps
+
+
+To view all the container irrelevant of the running or stopped
+Cmd> docker ps -a
+
+
+To stop the running container
+Cmd>docker stop <Container_Id /Continer_Name>
+
+
+To Remove the container
+Cmd> docker rm <Container_Id /Continer_Name>
+
+
+To view the contents from the Container
+Cmd> docker exec <Container_Id/Container_name> cat etc/hosts
+
+To run the container in the background
+Cmd>docker run -d <docker_image>
+
+
+To run the image with specific Tag
+Cmd>docker run -d <docker_image>:<Tag>
+
+
+
+To run the container with specific name from the image
+Cmd> docker run -d --name webapp nginx:1.14-alpine
+
+
+
+To run the container in Interactive Terminal way
+Cmd> docker run -it kodekloud/simple-prompt-docker
+
+
+
+Port mapping
+Cmd>  docker run -p 80:5000 kodekloud/simple-webapp
+80 is External Port where user is requesting
+5000 is internal Port of the container which is running in the docker host
+
+
+To inspect docker container
+Cmd>  docker inspect <Container_Id /Continer_Name>
+
+
+
+To view the logs of the container
+Cmd>docker logs <Container_Id /Continer_Name>
+
+
+
+To add the environment variable while running container
+Cmd>docker run -e <KEY>=<Value> <Image>
+
+
+How to see the list of environment variable on the running container
+Cmd>docker inspect <Container_Id /Continer_Name>
+You can find the environment In the config section
+
+
+
+
+Run a container named blue-app using image kodekloud/simple-webapp and set the environment variable APP_COLOR to blue. Make the application available on port 38282 on the host.  The application listens on port 8080.
+
+
+
+
+
+Deploy a mysql database using the mysql image and name it mysql-db.
+Set the database password to use db_pass123. Lookup the mysql image on Docker Hub and identify the correct environment variable to use for setting the root password.
+
+
+
+
+
+To build new docker image
+Cmd> docker build Dockerfile -t dockerusername/imagename
+Or
+Cmd>docker build -t imagename:tag .
+Or 
+Cmd> docker build .
+
+
+
+
+
+To see the list of networks
+Cmd> docker network ls
+
+
+
+To run the container with built in docker network
+Cmd> docker run ubuntu => this uses the Docker bridge network by default. This requires port mapping in case wanted to access it the host machine
+Cmd> docker run ubuntu --network=none => this uses the docker none network means completely isolated
+Cmd> docker run ubuntu --network=host => this uses the docker host network means same port is used in the docker and host port
+
+
+
+User defined networks
+To create custom network
+Cmd> docker network create  --driver bridge --subnet 182.18.0.0/16 custom-isolated-network
+
+
+
+To view the network which attached to container
+Cmd> docker inspect <Container_Name/Container_Id>
+	
+	 
+	
+
+	
+
+
+
+Deploy a mysql database using the mysql:5.6 image and name it mysql-db. Attach it to the newly created network wp-mysql-network. Set the database password to use db_pass123. The environment variable to set is MYSQL_ROOT_PASSWORD.
+
+Cmd> docker run -d --name mysql-db --network=wp-mysql-network -e MYSQL_ROOT_PASSWORD=db_pass123  mysql:5.6
+
+
+
+Deploy a web application named webapp using the kodekloud/simple-webapp-mysql image. Expose the port to 38080 on the host.
+
+The application makes use of two environment variable:
+1: DB_Host with the value mysql-db.
+2: DB_Password with the value db_pass123.
+Make sure to attach it to the newly created network called wp-mysql-network.
+
+Also make sure to link the MySQL and the webapp container.
+
+Cmd> docker run --network=wp-mysql-network -e DB_Host=mysql-db -e DB_Password=db_pass123 -p 38080:8080 --name webapp --link mysql-db:mysql-db -d kodekloud/simple-webapp-mysql
+
+
+
+
+Docker Storage
+
+To create a volume
+Cmd> docker volume create data_volume => this create a data_volume under the var/lib/volume/data_volume
+
+
+
+To mount a volume while running the container using run command
+Cmd> docker run -d -v data_volume=/var/lib/mysql mysql => this volume mounting
+
+
+
+Cmd> docker run -d  -v /data/mysql:/var/lib/mysql mysql => this is bind mounting means mounting to existing path
+
+Using -v is the oldest way of doing it
+
+New way is uses the --mount verbose
+
+Docker run -d --mount type=bind,source=/data/mysql, target=/var/lib/mysql mysql
+Source refers to the docker host location
+Target refers to the container location
+
+
+Storage drivers responsible to do the above. Some of the storage drivers are
+	• AUFS
+	• ZFS
+	• BTRFS
+	• Device Mapper
+	• Overlay
+	• Overlay2
+
+
+
+Run a mysql container again, but this time map a volume to the container so that the data stored by the container is stored at /opt/data on the host.
+Use the same name : mysql-db and same password: db_pass123 as before. Mysql stores data at /var/lib/mysql inside the container.
+
+Cmd> docker run -d --volume /opt/data:/var/lib/mysql  --name mysql-db -e MYSQL_ROOT_PASSWORD=db_pass123 mysql
+
+
+
+
+Next, create a simple container called clickcounter with the image kodekloud/click-counter, link it to the redis container that we created in the previous task and then expose it on the host port 8085
+The clickcounter app run on port 5000.
+if you are unsure, check the hints section for the exact commands.
+
+Cmd> docker run -d -p 8085:5000 --name clickcounter --link redis:redis kodekloud/click-counter
+
+
+
+
+Create a docker-compose.yml file under the directory /root/clickcounter. Once done, run docker-compose up.
+The compose file should have the exact specification as follows -
+redis service specification - Image name should be redis:alpine.
+clickcounter service specification - Image name should be kodekloud/click-counter, app is run on port 5000 and expose it on the host port 8085 in the compose file.
+
+Cmd> touch docker-compose.yml
+
+
+
+
+
+Docker Tutorial for Beginners | Docker Full Course | Access to FREE LABS [No Ads]
+
+
+
+
+https://kodekloud.com/p/docker-labs
+
+
+
